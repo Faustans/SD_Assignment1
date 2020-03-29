@@ -25,6 +25,26 @@ public enum States {
      */
     ASTR ("At the Storage Room");
 
+    /**
+     *
+     */
+    PKAT("Parking at the Arrival terminal");
+
+    /**
+     *
+     */
+    DF("Driving Forward");
+
+    /**
+     *
+     */
+    PKDT("Parking at the departure Terminal");
+
+    /**
+     *
+     */
+    DB("Driving Back");
+
     private final String description;
 
     private States(String description){
