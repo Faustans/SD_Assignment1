@@ -45,17 +45,17 @@ public class Airport {
 
         //shared memory regions
         Repository repo = new Repository();
-        ArrivalLounge arrivalLounge= new ArrivalLounge();
-        ArrivalTerminalExit arrivalTerminalExit= new ArrivalTerminalExit();
-        ArrivalTerminalTQuay arrivalTerminalTQuay = new ArrivalTerminalTQuay();
-        BaggageCollectionPoint baggageCollectionPoint = new BaggageCollectionPoint();
-        BaggageReclaimOffice baggageReclaimOffice = new BaggageReclaimOffice();
-        DepartureTerminalEntrance departureTerminalEntrance = new DepartureTerminalEntrance();
-        DepartureTerminalTQuay departureTerminalTQuay = new DepartureTerminalTQuay();
-        TemporaryStorageArea temporaryStorageArea = new TemporaryStorageArea();
+        ArrivalLounge arrivalLounge= new ArrivalLounge(repo);
+        ArrivalTerminalExit arrivalTerminalExit= new ArrivalTerminalExit(repo);
+        ArrivalTerminalTQuay arrivalTerminalTQuay = new ArrivalTerminalTQuay(repo);
+        BaggageCollectionPoint baggageCollectionPoint = new BaggageCollectionPoint(repo);
+        BaggageReclaimOffice baggageReclaimOffice = new BaggageReclaimOffice(repo);
+        DepartureTerminalEntrance departureTerminalEntrance = new DepartureTerminalEntrance(repo);
+        DepartureTerminalTQuay departureTerminalTQuay = new DepartureTerminalTQuay(repo);
+        TemporaryStorageArea temporaryStorageArea = new TemporaryStorageArea(repo);
 
         //entities
-        BusDriver busDriver = new BusDriver(repo);
+        BusDriver busDriver = new BusDriver(repo,arrivalTerminalTQuay,departureTerminalTQuay);
 
         //Initialize the passengers for each plane
         Plane[] planes = new Plane[P];

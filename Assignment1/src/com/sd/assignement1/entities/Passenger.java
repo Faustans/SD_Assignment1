@@ -72,6 +72,10 @@ public class Passenger extends Thread{
 
     }
 
+    public States setState(){
+        this.state = state;
+    }
+
     public Bag[] getBags(){
         return bags;
     }
@@ -91,16 +95,26 @@ public class Passenger extends Thread{
     private void goTo(States s){
         switch (state){
             case WSD:
+                try{
+                    Thread.sleep(100);
+                }
+                catch (InterruptedException e) {}
+                lounge.enter(this);
                 break;
             case ATT:
+                arrivalQuay.enter(this);
                 break;
             case DTT:
+                DQuay.enter(this);
                 break;
             case LCP:
+                baggageCollection.enter(this);
                 break;
             case BRO:
+                baggageReclaim.enter(this);
                 break;
             case EAT:
+                arrivalExit.enter(this);
                 break;
         }
     }
@@ -129,13 +143,13 @@ public class Passenger extends Thread{
                         else{
                             goTo(States.EAT);
                         }
-
                     }
                     break;
                 case ATT:
                     while(!arrivalQuay.enterBus(this));
                     break;
                 case TRT:
+                    ///
                     while(!departureEntrance.leaveBus(this));
                     break;
                 case DTT:

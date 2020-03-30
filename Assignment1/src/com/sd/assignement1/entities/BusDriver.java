@@ -46,7 +46,7 @@ public class BusDriver extends Thread {
      */
     private Repository repo;
 
-    private static Queue<Passenger> places = new PriorityQueue<>();
+    private static Deque<Passenger> places = new ArrayDeque<Passenger>();
 
     private static int passengerInTheBus = 0;
 
@@ -80,7 +80,13 @@ public class BusDriver extends Thread {
                     break;
                  case PKDT:
                     while(canGo!=true){
-                        departureTerminalTQuay.queueIn(exitInTheBus());
+                        if(passengerInTheBus==0){
+                            canGo=true;
+                        }
+                        else{
+                            departureTerminalTQuay.queueIn(exitInTheBus());
+                        }
+
                         goToArrivalTerminal();
                     }
                     break;
@@ -90,24 +96,19 @@ public class BusDriver extends Thread {
     }
 
     public void enterInTheBus(Passenger p){
-        if(passengerInTheBus==2){
+        if(passengerInTheBus==3){
             canGo=true;
         }
         else{
             passengerInTheBus++;
-            places.push(p);
+            places.addFirst(p);
         }
 
     }
     public Passenger exitInTheBus(){
-        Passenger p = new Passenger();
-        if(passengerInTheBus==0){
-            canGo=true;
-        }
-        else{
-            passengerInTheBus--;
-            p = places.pop();
-        }
+        Passenger p;
+        passengerInTheBus--;
+        p = places.pop();
         return p;
 
 
