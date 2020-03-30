@@ -1,7 +1,8 @@
 package com.sd.assignement1.entities;
 
 
-import com.sd.assignement1.sharedRegions.Repository;
+import com.sd.assignement1.sharedRegions.*;
+import java.util.*;
 
 
 /**
@@ -33,19 +34,19 @@ public class BusDriver extends Thread {
     /**
      * Arrival Terminal Quay
      */
-    private ArrivalTerminalTQuay ArrivalTerminalTQuay
+    private ArrivalTerminalTQuay arrivalTerminalTQuay;
 
     /**
      * Departure Terminal Quay
-      */
-    private DepartureTerminalTQuay
+     */
+    private DepartureTerminalTQuay departureTerminalTQuay;
 
     /**
      * Repository
      */
     private Repository repo;
 
-    private static Deque<Passenger> places = new ArrayDeque<Passenger>();
+    private static Queue<Passenger> places = new PriorityQueue<>();
 
     private static int passengerInTheBus = 0;
 
@@ -54,37 +55,37 @@ public class BusDriver extends Thread {
 
     public BusDriver(Repository repo, ArrivalTerminalTQuay a,DepartureTerminalTQuay d){
         super("BusDriver ");
-        arrivalTerminal = a;
+        this.arrivalTerminalTQuay = a;
         this.timerWait = new Timer();
-        departureTerminal = d;
-        state = States.PARKINGATTHEARRIVALTERMINAL;
-}
+        this.departureTerminalTQuay = d;
+        this.state = States.PKAT;
+    }
 
     @Override
     /**
      * BusDriver lifecycle
      */
     public void run(){
-            while( repo.hasDaysWorkEndned != false){
-                switch (state){
+        while( repo.hasDaysWorkEnded != false){
+            switch (state){
 
-                    case if(state==States.PKAT):
-                        this.timerWait = new Timer();
-                        this.timerWait.schedule(new stopTimerWaitingForPassnger(), 0, 500);
-                        while(canGo!=true){
-                            Passenger currentPassanger = ArrivalTerminalTQuay.queueOut(1);
-                            enterInTheBus(currentPassanger);
-                        }
-                        goToDepartureTerminal();
-                        break;
-                     case if(state==States.PKDT):
-                         while(canGo!=true){
-                             DepartureTerminalTQuay.queueIn(exitInTheBus());
-                             goToArrivalTerminal();
-                         }
-                        break;
-                }
+                case PKAT:
+                    this.timerWait = new Timer();
+                    this.timerWait.schedule(new TimerWaitingForPassenger(), 0, 500);
+                    while(canGo!=true){
+                        Passenger currentPassenger = arrivalTerminalTQuay.queueOut();
+                        enterInTheBus(currentPassenger);
+                    }
+                    goToDepartureTerminal();
+                    break;
+                 case PKDT:
+                    while(canGo!=true){
+                        departureTerminalTQuay.queueIn(exitInTheBus());
+                        goToArrivalTerminal();
+                    }
+                    break;
             }
+        }
 
     }
 
@@ -115,12 +116,11 @@ public class BusDriver extends Thread {
 
     private void stopTimerWaitingForPassenger(){
         canGo = true;
-        this.wait = false;
-        this.timerWait().cancel();
+        this.timerWait.cancel();
         this.timerWait.purge();
     }
 
-    class TimerWaitingForPassenger() extends TimerTask{
+    class TimerWaitingForPassenger extends TimerTask{
         int count = 0;
         public void run(){
             if(count < 4){
@@ -141,9 +141,9 @@ public class BusDriver extends Thread {
         return state;
     }
 
-    public void setState(State s){
+    public void setState(States s){
         StackTraceElement[] ste = Thread.currentThread().getStackTrace();
-        state = s;
+        this.state = s;
     }
 
     public void goToDepartureTerminal(){
