@@ -8,10 +8,20 @@ public class Bag {
 
     private boolean collected;
 
+    private String situation;
+
     public Bag(int id, int owner){
         this.id = id;
         this.owner = owner;
         this.collected = false;
+    }
+
+    public String getSituation(){
+        return situation;
+    }
+
+    public void setSituation(String situation) {
+        this.situation = situation;
     }
 
     public int getOwner() {

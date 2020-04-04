@@ -109,7 +109,7 @@ public class Porter extends Thread{
                     if(plane.empty()){
                         if(Plane.hasBags()){
                             bag = Plane.getBag();
-                            if(bag.getOwner().getSituation().equals("TRT")){
+                            if(bag.getSituation().equals("TRT")){
                                 goTo(States.APLH);
                             }
                             else{

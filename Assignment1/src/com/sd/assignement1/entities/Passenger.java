@@ -72,6 +72,7 @@ public class Passenger extends Thread{
 
     }
 
+
     public States setState(){
         this.state = state;
     }
@@ -129,7 +130,7 @@ public class Passenger extends Thread{
             plane.leave();
 
             goTo(States.WSD);
-
+            boolean skip = false;
 
             switch (state){
                 case WSD:
@@ -156,11 +157,17 @@ public class Passenger extends Thread{
                     goTo(States.EDT);
                     break;
                 case LCP:
-                    while (currBags==numBags)
+                    while (currBags!=numBags || skip)
                     for(Bag b : bags){
-                        if(baggageCollection.collectBag(b.getId())){
+                        Bag abc = baggageCollection.getBag(b.getId());
+                        if(abc.getOwner()>0){
                             currBags++;
                             b.setCollected();
+                        }
+                        else{
+                            goTo(States.BRO);
+                            skip = true;
+
                         }
                     }
                     //verify if any bag did not get collected;

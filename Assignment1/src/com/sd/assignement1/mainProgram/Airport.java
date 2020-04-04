@@ -73,17 +73,29 @@ public class Airport {
                     if (((int) (Math.random() * 2)) > 1) {
                         passengers[i] = new Passenger(passengerId, repo, bags, "TRF", States.WSD, z, arrivalLounge, arrivalTerminalExit, baggageCollectionPoint, baggageReclaimOffice, departureTerminalEntrance, departureTerminalTQuay, arrivalTerminalTQuay);
                         passengerId++;
+                        for(Bag b:bags){
+                            b.setSituation("TRF");
+                        }
                     } else {
                         passengers[i] = new Passenger(passengerId, repo, bags, "PKAT", States.WSD, z, arrivalLounge, arrivalTerminalExit, baggageCollectionPoint, baggageReclaimOffice, departureTerminalEntrance, departureTerminalTQuay, arrivalTerminalTQuay);
                         passengerId++;
+                        for(Bag b:bags){
+                            b.setSituation("PKAT");
+                        }
                     }
                 } else {
                     if (((int) (Math.random() * 2)) > 1) {
                         passengers[i] = new Passenger(passengerId, repo, bags, "TRF", States.WSD, 0, arrivalLounge, arrivalTerminalExit, baggageCollectionPoint, baggageReclaimOffice, departureTerminalEntrance, departureTerminalTQuay, arrivalTerminalTQuay);
                         passengerId++;
+                        for(Bag b:bags){
+                            b.setSituation("TRF");
+                        }
                     } else {
                         passengers[i] = new Passenger(passengerId, repo, bags, "PKAT", States.WSD, 0, arrivalLounge, arrivalTerminalExit, baggageCollectionPoint, baggageReclaimOffice, departureTerminalEntrance, departureTerminalTQuay, arrivalTerminalTQuay);
                         passengerId++;
+                        for(Bag b:bags){
+                            b.setSituation("PKAT");
+                        }
                     }
 
                 }
