@@ -80,5 +80,8 @@ public class Plane {
         return this.landed;
     }
 
+    public static int getCurrentBags(){
+        return this.currentBags;
+    }
 
 }

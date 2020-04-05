@@ -29,4 +29,7 @@ public class TemporaryStorageArea {
     public synchronized int getNumBags(){
         return numBags;
     }
+    public int numbOfBag(){
+        return bags.size();
+    }
 }

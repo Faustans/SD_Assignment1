@@ -179,7 +179,9 @@ public class BusDriver extends Thread {
         setState(States.PKDT);
     }
 
-
+    public static int getPassengerInTheBus(){
+        return passengerInTheBus;
+    }
 
 
 }

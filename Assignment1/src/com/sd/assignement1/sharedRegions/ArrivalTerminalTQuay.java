@@ -38,4 +38,8 @@ public class ArrivalTerminalTQuay {
             return false;
         }
     }
+    public static int waitingPassenger(){
+        return queue.size();
+    }
+
 }

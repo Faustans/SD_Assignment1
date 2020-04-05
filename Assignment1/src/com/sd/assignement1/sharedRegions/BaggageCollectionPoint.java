@@ -43,4 +43,7 @@ public class BaggageCollectionPoint {
         }
         return b;
     }
+    public int numbOfBag(){
+        return bags.size();
+    }
 }
