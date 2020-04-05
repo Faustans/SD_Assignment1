@@ -5,21 +5,21 @@ import java.util.Deque;
 
 public class Plane {
 
-    private static Deque<Bag> bagStack = new ArrayDeque<Bag>();
+    public static Deque<Bag> bagStack = new ArrayDeque<Bag>();
 
-    private static int id;
+    public static int id;
 
-    private static int numPassengers;
+    public static int numPassengers;
 
-    private static int numBags;
+    public static int numBags;
 
-    private static int currentPassengers;
+    public static int currentPassengers;
 
-    private static int currentBags;
+    public static int currentBags;
 
-    private static boolean landed;
+    public static boolean landed;
 
-    private static Passenger[] passengers;
+    public static Passenger[] passengers;
 
     public Plane(int id, int numPassengers, boolean landed){
         this.id = id;
@@ -31,53 +31,78 @@ public class Plane {
     }
 
     public synchronized void addBag(Bag b){
-        bagStack.add(b);
-        numBags+=1;
-        currentBags+=1;
+        synchronized (this) {
+            bagStack.add(b);
+            numBags += 1;
+            currentBags += 1;
+        }
     }
 
-    public synchronized static Bag getBag(){
-        currentBags--;
-        return bagStack.getFirst();
+    public synchronized  Bag getBag(){
+        synchronized (this) {
+            currentBags--;
+            return bagStack.getFirst();
+        }
     }
 
     public synchronized void addPassenger(Passenger p){
-        numPassengers+=1;
+        synchronized (this) {
+            currentPassengers +=1;
+        }
     }
 
     public synchronized boolean empty(){
-        if(currentPassengers == 0){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-
-    public synchronized static boolean hasBags(){
-        if(currentBags == 0){
-            return true;
-        }
-        else{
-            return false;
+        synchronized (this) {
+            if (currentPassengers == 0) {
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 
-    public synchronized void leave(){
-        if(numPassengers>0 && landed()){
-            numPassengers--;
-        }
-        else{
-            System.err.println("Number of passengers leaving the plane incorrect");
+    public synchronized  boolean hasBags(){
+        synchronized (this) {
+            if (currentBags > 0) {
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 
-    public synchronized void setLanded(boolean landed){
-        this.landed = landed;
+    public synchronized  void leave(){
+        synchronized (this) {
+            if (currentPassengers > 0 && landed()) {
+                currentPassengers--;
+
+                Passenger p = (Passenger) Thread.currentThread();
+                System.out.println("Passenger " + p.myId() +" leaving the plane------- " + " num people on board " + currentPassengers);
+                if(currentPassengers == 0){
+                    this.notifyAll();
+                }
+            } else {
+                System.err.println("Number of passengers leaving the plane incorrect");
+            }
+        }
+
+
+    }
+
+    public  synchronized  void setLanded(boolean landed){
+        synchronized (this){
+            this.landed = landed;
+            this.notifyAll();
+        }
+
+
+
     }
 
     public synchronized boolean landed(){
-        return this.landed;
+        synchronized (this) {
+            return this.landed;
+        }
     }
 
 

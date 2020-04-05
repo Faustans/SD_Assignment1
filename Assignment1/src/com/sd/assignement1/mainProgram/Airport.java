@@ -3,6 +3,8 @@ package com.sd.assignement1.mainProgram;
 import com.sd.assignement1.entities.*;
 import com.sd.assignement1.sharedRegions.*;
 
+import java.io.FileNotFoundException;
+import java.util.Date;
 import java.util.Random;
 
 public class Airport {
@@ -27,6 +29,11 @@ public class Airport {
     public static final int T = 3;
 
     /**
+     * Repository log filename
+     */
+    public static final String filename = "log_" + new Date().toString().replace(' ', '_') + ".txt";
+
+    /**
      * Minimum milliseconds to wakeup.
      * Affects Passenger walking time.
      */
@@ -38,10 +45,10 @@ public class Airport {
      */
     public static final int maxSleep = 10;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
         int passengerId = 1;
         int bagID = 1;
-
+        Passenger[] passengers = new Passenger[N*P];
 
         //shared memory regions
         Repository repo = new Repository();
@@ -59,7 +66,6 @@ public class Airport {
 
         //Initialize the passengers for each plane
         Plane[] planes = new Plane[P];
-        Passenger[] passengers = new Passenger[N];
 
         for(int plane = 0; plane<P;plane++) {
             for (int i = 0; i < N; i++) {
@@ -70,29 +76,33 @@ public class Airport {
                         bags[x] = new Bag(bagID, passengerId);
                         bagID++;
                     }
-                    if (((int) (Math.random() * 2)) > 1) {
-                        passengers[i] = new Passenger(passengerId, repo, bags, "TRF", States.WSD, z, arrivalLounge, arrivalTerminalExit, baggageCollectionPoint, baggageReclaimOffice, departureTerminalEntrance, departureTerminalTQuay, arrivalTerminalTQuay);
+                    if (((int) (Math.random() * 2)) > 0) {
+                        passengers[passengerId-1] = new Passenger(passengerId, repo, bags, "TRF", States.WSD, z, arrivalLounge, arrivalTerminalExit, baggageCollectionPoint, baggageReclaimOffice, departureTerminalEntrance, departureTerminalTQuay, arrivalTerminalTQuay);
                         passengerId++;
+                         
                         for(Bag b:bags){
                             b.setSituation("TRF");
                         }
                     } else {
-                        passengers[i] = new Passenger(passengerId, repo, bags, "PKAT", States.WSD, z, arrivalLounge, arrivalTerminalExit, baggageCollectionPoint, baggageReclaimOffice, departureTerminalEntrance, departureTerminalTQuay, arrivalTerminalTQuay);
+                        passengers[passengerId-1] = new Passenger(passengerId, repo, bags, "PKAT", States.WSD, z, arrivalLounge, arrivalTerminalExit, baggageCollectionPoint, baggageReclaimOffice, departureTerminalEntrance, departureTerminalTQuay, arrivalTerminalTQuay);
                         passengerId++;
+                         
                         for(Bag b:bags){
                             b.setSituation("PKAT");
                         }
                     }
                 } else {
-                    if (((int) (Math.random() * 2)) > 1) {
-                        passengers[i] = new Passenger(passengerId, repo, bags, "TRF", States.WSD, 0, arrivalLounge, arrivalTerminalExit, baggageCollectionPoint, baggageReclaimOffice, departureTerminalEntrance, departureTerminalTQuay, arrivalTerminalTQuay);
+                    if (((int) (Math.random() * 2)) > 0) {
+                        passengers[passengerId-1] = new Passenger(passengerId, repo, bags, "TRF", States.WSD, 0, arrivalLounge, arrivalTerminalExit, baggageCollectionPoint, baggageReclaimOffice, departureTerminalEntrance, departureTerminalTQuay, arrivalTerminalTQuay);
                         passengerId++;
+                         
                         for(Bag b:bags){
                             b.setSituation("TRF");
                         }
                     } else {
-                        passengers[i] = new Passenger(passengerId, repo, bags, "PKAT", States.WSD, 0, arrivalLounge, arrivalTerminalExit, baggageCollectionPoint, baggageReclaimOffice, departureTerminalEntrance, departureTerminalTQuay, arrivalTerminalTQuay);
+                        passengers[passengerId-1] = new Passenger(passengerId, repo, bags, "PKAT", States.WSD, 0, arrivalLounge, arrivalTerminalExit, baggageCollectionPoint, baggageReclaimOffice, departureTerminalEntrance, departureTerminalTQuay, arrivalTerminalTQuay);
                         passengerId++;
+                         
                         for(Bag b:bags){
                             b.setSituation("PKAT");
                         }
@@ -102,7 +112,8 @@ public class Airport {
             }
 
             planes[plane] = new Plane(plane, 6, false);
-            for (int z = 0; z < passengers.length; z++) {
+            for (int z = plane*N; z < (passengers.length*(plane+1))/(P); z++) {
+                System.out.println("Z ------------>               " + z + " ----- AND PLANE: " + plane);
                 planes[plane].addPassenger(passengers[z]);
                 if (passengers[z].getNumBags() > 0) {
                     Bag[] bags = passengers[z].getBags();
@@ -110,15 +121,22 @@ public class Airport {
                         planes[plane].addBag(bags[q]);
                     }
                 }
+                passengers[z].setPlane(planes[plane]);
             }
         }
 
         Porter porter = new Porter(repo, States.WPTL, planes[0], baggageCollectionPoint, temporaryStorageArea);
-
+        busDriver.setName("BusDriver");
         busDriver.start();
+        porter.setName("Porter");
         porter.start();
         for(Passenger p: passengers){
+            p.setName("Passenger"+p.myId());
             p.start();
+
+        }
+        for(Passenger p: passengers){
+
             try{
                 p.join();
             }

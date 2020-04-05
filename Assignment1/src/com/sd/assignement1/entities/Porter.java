@@ -59,32 +59,35 @@ public class Porter extends Thread{
         switch (s) {
             case WPTL:
                 try{
-                    Thread.sleep(100);
+                    Thread.sleep(1000);
                 }
                 catch (InterruptedException e) {}
                 state = States.WPTL;
                 break;
             case APLH:
-                try{
-                    Thread.sleep(100);
-                }
-                catch (InterruptedException e) {}
+
                 state = States.APLH;
                 break;
             case ALCB:
-                try{
-                    Thread.sleep(100);
-                }
-                catch (InterruptedException e) {}
+
                 state = States.ALCB;
                 break;
             case ASTR:
-                try{
-                    Thread.sleep(100);
-                }
-                catch (InterruptedException e) {}
+
                 state = States.ASTR;
                 break;
+        }
+    }
+
+    public synchronized void waitForEmptyPlane(){
+        synchronized (plane){
+            while(!plane.empty()){
+                try {
+                    plane.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -95,12 +98,12 @@ public class Porter extends Thread{
             switch (state){
                 case WPTL:
                     System.out.println("wptl");
-                    if(this.plane.landed()){
+                    if(plane.landed()){
                         state = States.APLH;
                     }
                     else{
                         try{
-                            Thread.sleep(2500);
+                            Thread.sleep(250);
                             plane.setLanded(true);
                         }
                         catch (InterruptedException e) {}
@@ -108,32 +111,30 @@ public class Porter extends Thread{
                     }
                     break;
                 case APLH:
-                    System.out.println("aplh");
-                    if(plane.empty()){
-                        if(Plane.hasBags()){
-                            bag = Plane.getBag();
-                            if(bag.getSituation().equals("TRT")){
-                                goTo(States.ASTR);
-                            }
-                            else{
-                                goTo(States.ALCB);
-                            }
-                        }
+                    System.out.println("APLH");
+                    while(!plane.empty()){
+                        waitForEmptyPlane();
                     }
-                    else{
-                        try{
-                            Thread.sleep(50);
+                    if(plane.hasBags()){
+                        bag = plane.getBag();
+                        if(bag.getSituation().equals("TRT")){
+                            goTo(States.ASTR);
                         }
-                        catch (InterruptedException e) {}
+                        else{
+                            goTo(States.ALCB);
+                        }
+                    }else {
+                        goTo(States.WPTL);
+                    }
 
-                    }
                     break;
                 case ALCB:
-                    System.out.println("alcb");
+                    System.out.println("ALCB");
                     baggageCollectionPoint.addBag(bag);
                     goTo(States.APLH);
                     break;
                 case ASTR:
+                    System.out.println("ASTR");
                     temporaryStorageArea.addBag(bag);
                     goTo(States.APLH);
                     break;

@@ -77,6 +77,10 @@ public class Passenger extends Thread{
         this.state = state;
     }
 
+    public int myId(){
+        return id;
+    }
+
     public Bag[] getBags(){
         return bags;
     }
@@ -93,29 +97,32 @@ public class Passenger extends Thread{
         this.plane = plane;
     }
 
+    public synchronized void waitToArrive(){
+        while (!DQuay.busArrived()){
+            try {
+                synchronized (DQuay){
+                    DQuay.wait();
+                }
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     private void goTo(States s){
-        switch (state){
+        switch (s){
             case WSD:
                 System.out.println("Wsd");
-                try{
-                    Thread.sleep(100);
-                }
-                catch (InterruptedException e) {}
-                lounge.enter(this);
+                setState(States.WSD);
                 break;
             case ATT:
                 System.out.println("att");
-                arrivalQuay.enter(this);
+                setState(States.ATT);
                 break;
             case TRT:
                 System.out.println("trt");
-                while (!DQuay.busArrived()){
-                    try {
-                        wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
+                waitToArrive();
                 goTo(States.DTT);
                 break;
             case DTT:
@@ -126,14 +133,17 @@ public class Passenger extends Thread{
             case LCP:
                 System.out.println("lcp");
                 baggageCollection.enter(this);
+                setState(States.LCP);
                 break;
             case BRO:
                 System.out.println("bro");
                 baggageReclaim.enter(this);
+                setState(States.BRO);
                 break;
             case EAT:
                 System.out.println("eat");
                 arrivalExit.enter(this);
+                setState(States.EAT);
                 break;
             case EDT:
                 System.out.println("edt");
@@ -143,29 +153,54 @@ public class Passenger extends Thread{
         }
     }
 
+    public synchronized void callWaitPlane() throws InterruptedException {
+        while(!plane.landed()) {
+            System.out.println("Waiting");
+            synchronized (plane){
+                plane.wait();
+            }
+
+        }
+    }
+    public synchronized void waitILeft() {
+        while (!DQuay.haveILeft(this)) {
+            try {
+                synchronized (DQuay) {
+                    DQuay.wait();
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 
     @Override
     public void run(){
         System.out.println("Passenger running");
+        boolean leftPlane = false;
+        boolean skip = false;
+
         while(!ended){
 
-            while(!plane.landed()){
+            if (!leftPlane){
                 System.out.println("waiting for plane to land");
                 try {
-                    Thread.sleep(100);
+                    callWaitPlane();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-            };
+                plane.leave();
+                leftPlane = true;
+                goTo(States.WSD);
 
-            plane.leave();
+            }
 
-            goTo(States.WSD);
-            boolean skip = false;
 
             switch (state){
                 case WSD:
-                    if(situation.equalsIgnoreCase("TRT")){
+                    System.out.println("Wsd");
+                    if(situation.equalsIgnoreCase("TRF")){
                         goTo(States.ATT);
                     }
                     else{
@@ -177,36 +212,44 @@ public class Passenger extends Thread{
                         }
                     }
                     break;
-                case ATT:
+                case ATT:System.out.println("ATT");
                     arrivalQuay.enterQueue();
                     goTo(States.TRT);
                     break;
                 case TRT:
                     ///
-                    while(!DQuay.haveILeft(this)){
-                        try {
-                            wait();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
+                    waitILeft();
+                    goTo(States.DTT);
                     break;
                 case DTT:
                     goTo(States.EDT);
                     break;
                 case LCP:
-                    while (currBags!=numBags || skip)
-                    for(Bag b : bags){
-                        Bag abc = baggageCollection.getBag(b.getId());
-                        if(abc.getOwner()>0){
-                            currBags++;
-                            b.setCollected();
+                    int counter = 0;
+                    while (currBags!=numBags) {
+                        counter++;
+                        skip = false;
+                        if(counter == 100)
+                            break;
+                        for (Bag b : bags) {
+                            Bag abc = baggageCollection.getBag(b.getId());
+                            if (abc.getOwner() > 0) {
+                                currBags++;
+                                b.setCollected();
+                            } else {
+                                skip = true;
+                            }
                         }
-                        else{
-                            goTo(States.BRO);
-                            skip = true;
-
+                        try {
+                            Thread.sleep(50);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
+                    }
+                    if(counter == 1000 && skip){
+                        goTo(States.BRO);
+                    }else{
+                        goTo(States.EAT);
                     }
                     //verify if any bag did not get collected;
                     break;
