@@ -67,13 +67,13 @@ public class Passenger extends Thread{
         this.departureEntrance = departureEntrance;
         this.DQuay = DQuay;
         this.arrivalQuay = arrivalQuay;
-        this.ended = true;
+        this.ended = false;
 
 
     }
 
 
-    public States setState(){
+    public void setState(States state){
         this.state = state;
     }
 
@@ -96,6 +96,7 @@ public class Passenger extends Thread{
     private void goTo(States s){
         switch (state){
             case WSD:
+                System.out.println("Wsd");
                 try{
                     Thread.sleep(100);
                 }
@@ -103,19 +104,41 @@ public class Passenger extends Thread{
                 lounge.enter(this);
                 break;
             case ATT:
+                System.out.println("att");
                 arrivalQuay.enter(this);
                 break;
+            case TRT:
+                System.out.println("trt");
+                while (!DQuay.busArrived()){
+                    try {
+                        wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                goTo(States.DTT);
+                break;
             case DTT:
-                DQuay.enter(this);
+                System.out.println("dtt");
+                //DQuay.enter(this);
+                goTo(States.EDT);
                 break;
             case LCP:
+                System.out.println("lcp");
                 baggageCollection.enter(this);
                 break;
             case BRO:
+                System.out.println("bro");
                 baggageReclaim.enter(this);
                 break;
             case EAT:
+                System.out.println("eat");
                 arrivalExit.enter(this);
+                break;
+            case EDT:
+                System.out.println("edt");
+                departureEntrance.enter(this);
+                ended = true;
                 break;
         }
     }
@@ -123,9 +146,17 @@ public class Passenger extends Thread{
 
     @Override
     public void run(){
+        System.out.println("Passenger running");
         while(!ended){
 
-            while(!plane.landed());
+            while(!plane.landed()){
+                System.out.println("waiting for plane to land");
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            };
 
             plane.leave();
 
@@ -147,11 +178,18 @@ public class Passenger extends Thread{
                     }
                     break;
                 case ATT:
-                    while(!arrivalQuay.enterBus(this));
+                    arrivalQuay.enterQueue();
+                    goTo(States.TRT);
                     break;
                 case TRT:
                     ///
-                    while(!departureEntrance.leaveBus(this));
+                    while(!DQuay.haveILeft(this)){
+                        try {
+                            wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
                     break;
                 case DTT:
                     goTo(States.EDT);

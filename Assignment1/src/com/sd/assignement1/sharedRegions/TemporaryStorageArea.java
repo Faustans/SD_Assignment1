@@ -11,15 +11,22 @@ public class TemporaryStorageArea {
 
     private ArrayList<Bag> bags;
 
-    private int numPassengersInside;
+    private int numBags;
+
+
 
     public TemporaryStorageArea(Repository repo) {
         this.repo = repo;
         this.bags = new ArrayList<>();
-        this.numPassengersInside = 0;
+        this.numBags = 0;
     }
 
     public synchronized void addBag(Bag b){
         bags.add(b);
+        numBags++;
+    }
+
+    public synchronized int getNumBags(){
+        return numBags;
     }
 }

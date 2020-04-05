@@ -37,7 +37,7 @@ public class Plane {
     }
 
     public synchronized static Bag getBag(){
-        numBags--;
+        currentBags--;
         return bagStack.getFirst();
     }
 
@@ -77,7 +77,7 @@ public class Plane {
     }
 
     public synchronized boolean landed(){
-        return landed;
+        return this.landed;
     }
 
 

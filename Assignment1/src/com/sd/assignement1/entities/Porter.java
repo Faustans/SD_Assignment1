@@ -37,7 +37,7 @@ public class Porter extends Thread{
     public Porter(Repository repo, States state, Plane p, BaggageCollectionPoint baggageCollectionPoint, TemporaryStorageArea temporaryStorageArea){
         this.state = state;
         this.repo = repo;
-        this.plane = plane;
+        this.plane = p;
         this.baggageCollectionPoint = baggageCollectionPoint;
         this.temporaryStorageArea = temporaryStorageArea;
 
@@ -94,26 +94,29 @@ public class Porter extends Thread{
         while(!ended){
             switch (state){
                 case WPTL:
-                    if(plane.landed()){
+                    System.out.println("wptl");
+                    if(this.plane.landed()){
                         state = States.APLH;
                     }
                     else{
                         try{
-                            Thread.sleep(50);
+                            Thread.sleep(2500);
+                            plane.setLanded(true);
                         }
                         catch (InterruptedException e) {}
 
                     }
                     break;
                 case APLH:
+                    System.out.println("aplh");
                     if(plane.empty()){
                         if(Plane.hasBags()){
                             bag = Plane.getBag();
                             if(bag.getSituation().equals("TRT")){
-                                goTo(States.APLH);
+                                goTo(States.ASTR);
                             }
                             else{
-                                goTo(States.ASTR);
+                                goTo(States.ALCB);
                             }
                         }
                     }
@@ -126,6 +129,7 @@ public class Porter extends Thread{
                     }
                     break;
                 case ALCB:
+                    System.out.println("alcb");
                     baggageCollectionPoint.addBag(bag);
                     goTo(States.APLH);
                     break;

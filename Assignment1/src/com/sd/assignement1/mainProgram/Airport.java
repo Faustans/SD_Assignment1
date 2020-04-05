@@ -67,7 +67,7 @@ public class Airport {
                 Bag bags[] = new Bag[z];
                 if (z > 0) {
                     for (int x = 0; x < z; x++) {
-                        bags[i] = new Bag(bagID, passengerId);
+                        bags[x] = new Bag(bagID, passengerId);
                         bagID++;
                     }
                     if (((int) (Math.random() * 2)) > 1) {

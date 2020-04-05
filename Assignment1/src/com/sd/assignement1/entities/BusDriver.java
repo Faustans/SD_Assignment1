@@ -66,16 +66,25 @@ public class BusDriver extends Thread {
      * BusDriver lifecycle
      */
     public void run(){
-        while( repo.hasDaysWorkEnded != false){
+        while( hasDaysWorkEnded() != false){
             switch (state){
 
                 case PKAT:
                     this.timerWait = new Timer();
                     this.timerWait.schedule(new TimerWaitingForPassenger(), 0, 500);
-                    while(canGo!=true){
-                        Passenger currentPassenger = arrivalTerminalTQuay.queueOut();
-                        enterInTheBus(currentPassenger);
+                    while(!canGo){
+                        while(!arrivalTerminalTQuay.queueEmpty()){
+                            enterInTheBus(arrivalTerminalTQuay.getPassenger());
+                        }
+                        while(arrivalTerminalTQuay.queueEmpty() || !canGo){
+                            try {
+                                wait(200);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
+                    notifyAll();
                     goToDepartureTerminal();
                     break;
                  case PKDT:
@@ -84,7 +93,9 @@ public class BusDriver extends Thread {
                             canGo=true;
                         }
                         else{
-                            departureTerminalTQuay.queueIn(exitInTheBus());
+                            while (passengerInTheBus>0){
+                                departureTerminalTQuay.queueIn(exitInTheBus());
+                            }
                         }
 
                         goToArrivalTerminal();
@@ -94,6 +105,7 @@ public class BusDriver extends Thread {
         }
 
     }
+
 
     public void enterInTheBus(Passenger p){
         if(passengerInTheBus==3){
@@ -132,6 +144,10 @@ public class BusDriver extends Thread {
                 stopTimerWaitingForPassenger();
             }
         }
+    }
+
+    private boolean hasDaysWorkEnded(){
+        return false;
     }
 
     /**
