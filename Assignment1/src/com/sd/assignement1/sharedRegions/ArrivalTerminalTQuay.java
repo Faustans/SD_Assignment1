@@ -3,6 +3,7 @@ package com.sd.assignement1.sharedRegions;
 import com.sd.assignement1.entities.Passenger;
 import com.sd.assignement1.mainProgram.Airport;
 
+import java.util.ArrayDeque;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
@@ -13,10 +14,14 @@ import java.util.Queue;
  */
 public class ArrivalTerminalTQuay {
 
+<<<<<<< HEAD
     /**
      * Queue of passenger waiting to enter in the bus
      */
     private static Queue<Passenger> queue = new PriorityQueue<>();
+=======
+    private static Queue<Passenger> queue = new ArrayDeque<>();
+>>>>>>> 902cd58e893d4c56c6e4a7ca0f3b3ac796346df8
 
     /**
      * Repository
@@ -45,7 +50,10 @@ public class ArrivalTerminalTQuay {
     public synchronized void enterQueue(){
         Passenger p = (Passenger) Thread.currentThread();
         queue.add(p);
-        notifyAll();
+        synchronized (this){
+            this.notifyAll();
+        }
+
 
     }
 

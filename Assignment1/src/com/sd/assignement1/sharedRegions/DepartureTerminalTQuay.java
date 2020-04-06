@@ -3,6 +3,7 @@ package com.sd.assignement1.sharedRegions;
 import com.sd.assignement1.entities.Passenger;
 import com.sd.assignement1.entities.States;
 
+import java.util.ArrayDeque;
 import java.util.PriorityQueue;
 import java.util.Queue;
 /**
@@ -20,10 +21,14 @@ public class DepartureTerminalTQuay {
      * Boolean that confirm is in the Departure Terminal Quay
      */
     private static boolean busHere;
+<<<<<<< HEAD
     /**
      * Queue of the person that leave the bus to Departure Terminal Quay
      */
     private static Queue<Passenger> queue = new PriorityQueue<>(100);
+=======
+    private static Queue<Passenger> queue = new ArrayDeque<>(100);
+>>>>>>> 902cd58e893d4c56c6e4a7ca0f3b3ac796346df8
 
     /**
      * Departure Terminal Quay instantion
@@ -39,8 +44,17 @@ public class DepartureTerminalTQuay {
      * @param p
      */
     public synchronized void queueIn(Passenger p){
-        queue.add(p);
-        notifyAll();
+        synchronized (this){
+            queue.add(p);
+        }
+    }
+
+    public synchronized void setArrived(boolean b){
+        synchronized (this){
+            this.busHere = b;
+            this.notifyAll();
+        }
+
     }
 
     /**

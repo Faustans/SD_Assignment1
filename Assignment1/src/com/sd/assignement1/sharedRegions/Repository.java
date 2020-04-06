@@ -1,5 +1,12 @@
 package com.sd.assignement1.sharedRegions;
 
+import com.sd.assignement1.entities.States;
+import com.sd.assignement1.mainProgram.Airport;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+
 public class Repository {
     //State abreviations
 
@@ -45,10 +52,17 @@ public class Repository {
         numberOfBagsPassenger = 0;
         numberOfCurrentBags = 0;
 
+<<<<<<< HEAD
         busDriverState = new States.PKAT;
         passengerInTheBus = 0;
 
         porterState = new States.WPTL;
+=======
+        busDriverState = States.PKAT;
+        passengerInTheBus = 0;
+
+        porterState =  States.WPTL;
+>>>>>>> 902cd58e893d4c56c6e4a7ca0f3b3ac796346df8
         planeId = 0;
         currentBags = 0;
         waitingArrivalTerminalTQuay = 0;
@@ -70,6 +84,7 @@ public class Repository {
     }
 
 
+<<<<<<< HEAD
     public synchronized void setPassengerState(int id, States passengerState, boolean export){
         if (passengerState[id]!=passengerState){
             passengerState[id]=passengerState;
@@ -84,10 +99,31 @@ public class Repository {
         numberOfBagsPassenger++;
         //Reavaliar
         setPassengerState(numberOfBagsPassenger, States.RECEPTION, true);
+=======
+    public synchronized void setPassengerState(int id, States pState, boolean export){
+        if (passengerState[id]!=pState){
+            passengerState[id]=pState;
+            export();
+        }
+    }
+
+    public synchronized void setPlaneState(int fn, int bn){
+
+    }
+
+    /**
+     * Increment number of Bags Passagenger
+     */
+    public synchronized void inNumberOfBagsPassenger(int numberOfBagsPassenger, States st) {
+        numberOfBagsPassenger++;
+        //Reavaliar
+        setPassengerState(numberOfBagsPassenger, st, true);
+>>>>>>> 902cd58e893d4c56c6e4a7ca0f3b3ac796346df8
     }
 
 
     /**
+<<<<<<< HEAD
      * Decrement number of Bags Passagenger
      */
     public synchronized void inNumberOfBagsPassenger(int numberOfBagsPassenger) {
@@ -97,6 +133,8 @@ public class Repository {
     }
 
     /**
+=======
+>>>>>>> 902cd58e893d4c56c6e4a7ca0f3b3ac796346df8
      * Prints the internal state and also saves it to a file.
      */
     private void export() {
@@ -112,11 +150,43 @@ public class Repository {
      */
 
     private String getInternalState(){
+<<<<<<< HEAD
 
     }
 
 
 
+=======
+        String str = stateAbrv[managerState.ordinal()] + "  ";
+        for (int i = 0; i < RepairShop.M; i++) {
+            str += String.format("%s ", stateAbrv[mechanicsState[i].ordinal()]);
+        }
+
+        for (int i = 0; i < RepairShop.N; i++) {
+            str += String.format(" %s %02d %s %s ", stateAbrv[customerStates[i].ordinal()], currentCarId[i],
+                    booleanToStr(wantRental[i]), booleanToStr(carRepaired[i]));
+
+            if ((i+1) % 10 == 0)
+                str += "\n              ";
+        }
+
+        str += String.format("  %02d %02d %02d", customerQueue, waitingForKey, finishedJobs);
+        str += String.format("                  %02d  %02d", customerCars, replacementCars);
+        str += String.format("          %02d ", reqCount);
+
+        for (int i = 0; i < RepairShop.K; i++) {
+            str += String.format("  %02d  %02d  %s ", stock[i], pendingVehicles[i], booleanToStr(managerAlerted[i]));
+        }
+
+        str += "               ";
+
+        for (int i = 0; i < RepairShop.K; i++) {
+            str += String.format("  %02d", soldParts[i]);
+        }
+
+        return str + "\n\n";
+    }
+>>>>>>> 902cd58e893d4c56c6e4a7ca0f3b3ac796346df8
 
 
 }

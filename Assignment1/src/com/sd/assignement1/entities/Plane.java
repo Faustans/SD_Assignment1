@@ -5,6 +5,7 @@ import java.util.Deque;
 
 public class Plane {
 
+<<<<<<< HEAD
     /**
      * Queue of the bags in the plane
      */
@@ -44,6 +45,23 @@ public class Plane {
      * Array with the passengers in the plane
      */
     private static Passenger[] passengers;
+=======
+    public static Deque<Bag> bagStack = new ArrayDeque<Bag>();
+
+    public static int id;
+
+    public static int numPassengers;
+
+    public static int numBags;
+
+    public static int currentPassengers;
+
+    public static int currentBags;
+
+    public static boolean landed;
+
+    public static Passenger[] passengers;
+>>>>>>> 902cd58e893d4c56c6e4a7ca0f3b3ac796346df8
 
     /**
      *  Passenger instantiation
@@ -66,11 +84,14 @@ public class Plane {
      * @param b
      */
     public synchronized void addBag(Bag b){
-        bagStack.add(b);
-        numBags+=1;
-        currentBags+=1;
+        synchronized (this) {
+            bagStack.add(b);
+            numBags += 1;
+            currentBags += 1;
+        }
     }
 
+<<<<<<< HEAD
     /**
      * Get a bag from the plane
      * @return
@@ -78,6 +99,13 @@ public class Plane {
     public synchronized static Bag getBag(){
         currentBags--;
         return bagStack.getFirst();
+=======
+    public synchronized  Bag getBag(){
+        synchronized (this) {
+            currentBags--;
+            return bagStack.getFirst();
+        }
+>>>>>>> 902cd58e893d4c56c6e4a7ca0f3b3ac796346df8
     }
 
     /**
@@ -85,7 +113,9 @@ public class Plane {
      * @param p
      */
     public synchronized void addPassenger(Passenger p){
-        numPassengers+=1;
+        synchronized (this) {
+            currentPassengers +=1;
+        }
     }
 
     /**
@@ -93,14 +123,16 @@ public class Plane {
      * @return
      */
     public synchronized boolean empty(){
-        if(currentPassengers == 0){
-            return true;
-        }
-        else{
-            return false;
+        synchronized (this) {
+            if (currentPassengers == 0) {
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 
+<<<<<<< HEAD
     /**
      *  Confirm if the plane have baggs or if is empty
      * @return
@@ -123,19 +155,59 @@ public class Plane {
         }
         else{
             System.err.println("Number of passengers leaving the plane incorrect");
+=======
+    public synchronized  boolean hasBags(){
+        synchronized (this) {
+            if (currentBags > 0) {
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 
+    public synchronized  void leave(){
+        synchronized (this) {
+            if (currentPassengers > 0 && landed()) {
+                currentPassengers--;
+
+                Passenger p = (Passenger) Thread.currentThread();
+                System.out.println("Passenger " + p.myId() +" leaving the plane------- " + " num people on board " + currentPassengers);
+                if(currentPassengers == 0){
+                    this.notifyAll();
+                }
+            } else {
+                System.err.println("Number of passengers leaving the plane incorrect");
+            }
+>>>>>>> 902cd58e893d4c56c6e4a7ca0f3b3ac796346df8
+        }
+
+
+    }
+
+<<<<<<< HEAD
     /**
      * Set if the plane is landed or not
      * @param landed
      */
     public synchronized void setLanded(boolean landed){
         this.landed = landed;
+=======
+    public  synchronized  void setLanded(boolean landed){
+        synchronized (this){
+            this.landed = landed;
+            this.notifyAll();
+        }
+
+
+
+>>>>>>> 902cd58e893d4c56c6e4a7ca0f3b3ac796346df8
     }
 
     public synchronized boolean landed(){
-        return this.landed;
+        synchronized (this) {
+            return this.landed;
+        }
     }
 
     /**

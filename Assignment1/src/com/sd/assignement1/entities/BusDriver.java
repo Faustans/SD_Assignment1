@@ -69,36 +69,59 @@ public class BusDriver extends Thread {
         this.state = States.PKAT;
     }
 
+    private synchronized void waitForArrivalQueue(){
+        synchronized (arrivalTerminalTQuay){
+            try {
+                arrivalTerminalTQuay.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private synchronized void notifyArrival(){
+        synchronized (this){
+            this.notifyAll();
+        }
+    }
+
     @Override
     /**
      * BusDriver lifecycle
      */
     public void run(){
-        while( hasDaysWorkEnded() != false){
+        while(!hasDaysWorkEnded()){
             switch (state){
 
                 case PKAT:
+                    System.out.println("----------PKAT");
                     this.timerWait = new Timer();
                     this.timerWait.schedule(new TimerWaitingForPassenger(), 0, 500);
                     while(!canGo){
                         while(!arrivalTerminalTQuay.queueEmpty()){
                             enterInTheBus(arrivalTerminalTQuay.getPassenger());
                         }
-                        while(arrivalTerminalTQuay.queueEmpty() || !canGo){
-                            try {
-                                wait(200);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
+                       // while(arrivalTerminalTQuay.queueEmpty() || !canGo){
+                       //     waitForArrivalQueue();
+                       // }
                     }
-                    notifyAll();
+                    notifyArrival();
                     goToDepartureTerminal();
                     break;
+                case DF:
+                    System.out.println("----------driv F");
+                    parkTheBusDepartureTerminal();
+                    break;
+                case DB:
+                    System.out.println("----------driv b");
+                    parkTheBusArrivalTerminal();
+                    break;
                  case PKDT:
-                    while(canGo!=true){
+                     departureTerminalTQuay.setArrived(true);
+                     System.out.println("----------PKDT");
+                    while(canGo==true){
                         if(passengerInTheBus==0){
-                            canGo=true;
+                            canGo=false;
                         }
                         else{
                             while (passengerInTheBus>0){
@@ -199,19 +222,20 @@ public class BusDriver extends Thread {
      * Change the state when go to Arraival Terminal
      */
     public void goToArrivalTerminal(){
+        departureTerminalTQuay.setArrived(false);
         setState(States.DB);
     }
     /**
      * Change the state when go to parkTheBusDepartureTerminal
      */
     public void parkTheBusDepartureTerminal(){
-        setState(States.PKAT);
+        setState(States.PKDT);
     }
     /**
      * Change the state when park bus in arrival terminal
      */
     public void parkTheBusArrivalTerminal(){
-        setState(States.PKDT);
+        setState(States.PKAT);
     }
     /**
      * Change the state enter in the bus
