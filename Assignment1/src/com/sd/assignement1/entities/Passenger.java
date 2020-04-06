@@ -4,50 +4,122 @@ import com.sd.assignement1.sharedRegions.*;
 
 /**
  * This datatype implements the Passenger thread.
- * In his lifecycle, the passenger breaks his car,
- * gets (or not) a replacement car, and gets his
- * car fixed. <p>
- * He follows the following order:
- * <ul>
- * <li> Uses his car until it breaks down;
- * <li> Goes to repair shop and queues in;
- * <li> Asks (or not) the manager for a replacement car;
- * <li> Goes back to work with a replacement car or by bus;
- * <li> After the manager calls, the customer goes back to the shop;
- * <li> Finally the customer pays for the service, and gets the car back.
- * </ul>
+ * Have 4 options
+ * 1 option
+ * 1 - at the disembarking zone
+ * 1.2 at the arrival transfer terminal
+ * 1.3 terminal transfer
+ * 1.4 at the departure transfer terminal
+ * 1.5 entering the departure terminal
+ *
+ * 2 option
+ * 2 - at the disembarking zone
+ * 2.1 - at the luggage collection point
+ * 2.2 - at the baggage reclaim office
+ * 2.3 - exiting the arrival terminal
+ *
+ * 3  option
+ * 3 - at the disembarking zone
+ * 3.1 - at the luggage collection point
+ * 3.2 - exiting the arrival terminal
+ *
+ *  * 4  option
+ *  * 4 - at the disembarking zone
+ *  * 4.1 - exiting the arrival terminal
  */
 
 public class Passenger extends Thread{
 
+    /**
+     * if ended and exit of Airport
+     */
     private boolean ended;
 
+    /**
+     * Passenger id
+     */
     private int id;
 
+    /**
+     * Repository
+     */
     private Repository repo;
 
+    /**
+     * Array of bags
+     */
     private Bag[] bags;
 
+    /**
+     * Situation if the passenger going to exit or anothe fly
+     */
     private String situation;
 
+    /**
+     * Passenger state
+     */
     private States state;
 
+    /**
+     * Number of Bags
+     */
     private int numBags;
 
+    /**
+     * Number of current bags with the passenger
+     */
     private int currBags;
 
+    /**
+     * Plane of Passenger
+     */
     private Plane plane;
 
+    /**
+     * Arrival Lounge
+     */
     private ArrivalLounge lounge;
+    /**
+     * Arrival Terminal of Exit
+     */
     private ArrivalTerminalExit arrivalExit;
+    /**
+     * Baggage Collection Point
+     */
     private BaggageCollectionPoint baggageCollection;
-
+    /**
+     * Baggage Reclaim Office
+     */
     private BaggageReclaimOffice baggageReclaim;
+    /**
+     * Departure Terminal Entrance
+     */
     private DepartureTerminalEntrance departureEntrance;
+    /**
+     * Departure Termminal Quay
+     */
     private DepartureTerminalTQuay DQuay;
+    /**
+     * Arrival Terminal Quay
+     */
     private ArrivalTerminalTQuay arrivalQuay;
 
-
+    /**
+     *  Passenger instantiation
+     * @param id  Identifier of passenger
+     * @param repo Repositoru
+     * @param bags  Array of Bags
+     * @param situation Situation of the passenger
+     * @param state State of the passenger
+     * @param numBags Number of bags that passenger have
+     * @param lounge Arrival Lounge
+     * @param arrivalExit Arrival Terminal Exit
+     * @param baggageCollection Baggage Collection Point
+     * @param baggageReclaim Baggage Reclaim Office
+     * @param departureEntrance Departure Terminal Entrance
+     * @param DQuay Departure Terminal Quay
+     * @param arrivalQuay Arrival Terminal Quay
+     */
     public Passenger(int id, Repository repo, Bag[] bags, String situation, States state, int numBags,
                      ArrivalLounge lounge,
                      ArrivalTerminalExit arrivalExit, BaggageCollectionPoint baggageCollection,
@@ -72,27 +144,53 @@ public class Passenger extends Thread{
 
     }
 
-
+    /**
+     * Set the state of Passenger
+     * @param state
+     */
     public void setState(States state){
         this.state = state;
     }
+
+    /**
+     * Get the bags of the passenger
+     * @return
+     */
 
     public Bag[] getBags(){
         return bags;
     }
 
+    /**
+     * Get the number of bags that passenger have
+     * @return
+     */
+
     public int getNumBags(){
         return numBags;
     }
+
+    /**
+     * Get the Situation of passenger if need to take another plane of is going to the exit terminal
+     * @return
+     */
 
     public String getSituation(){
         return situation;
     }
 
+    /**
+     * Set plane of the passenger
+     * @param plane
+     */
     public void setPlane(Plane plane){
         this.plane = plane;
     }
 
+    /**
+     * Decide where the passenger need to go depend of the atual state
+     * @param s
+     */
     private void goTo(States s){
         switch (state){
             case WSD:
@@ -143,7 +241,9 @@ public class Passenger extends Thread{
         }
     }
 
-
+    /**
+     * Passenger lifecycle
+     */
     @Override
     public void run(){
         System.out.println("Passenger running");

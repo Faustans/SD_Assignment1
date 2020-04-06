@@ -6,18 +6,16 @@ import java.util.*;
 
 
 /**
- * This datatype implements the Passenger thread.
- * In his lifecycle, the passenger breaks his car,
- * gets (or not) a replacement car, and gets his
- * car fixed. <p>
+ * This datatype implements the BusDriver thread.
+ * In his lifecycle, the BusDriver parking in the arrival terminal,
+ * waiting for tha passenger, and go to departure terminal when the bus is full, or after a time
+ *
  * He follows the following order:
  * <ul>
- * <li> Uses his car until it breaks down;
- * <li> Goes to repair shop and queues in;
- * <li> Asks (or not) the manager for a replacement car;
- * <li> Goes back to work with a replacement car or by bus;
- * <li> After the manager calls, the customer goes back to the shop;
- * <li> Finally the customer pays for the service, and gets the car back.
+ * <li> parking at the arrival terminal
+ * <li> driving forward
+ * <li> parking at the departure terminal
+ * <li> driving backward
  * </ul>
  */
 
@@ -46,12 +44,22 @@ public class BusDriver extends Thread {
      */
     private Repository repo;
 
+    /**
+     *  Deque Array that have the free places in the bus an the opossite
+     */
+
     private static Deque<Passenger> places = new ArrayDeque<Passenger>();
 
     private static int passengerInTheBus = 0;
 
     public boolean canGo = false;
 
+    /**
+     * BusDriver instantiation
+     * @param repo Repository
+     * @param a ArrivalTerminalTQuay
+     * @param d DepartureTerminalTQuay
+     */
 
     public BusDriver(Repository repo, ArrivalTerminalTQuay a,DepartureTerminalTQuay d){
         super("BusDriver ");
@@ -106,7 +114,10 @@ public class BusDriver extends Thread {
 
     }
 
-
+    /**
+     * Function to enter the bus, that change the flag "canGo" if the bus is full
+     * @param p Passanger that won enter in the bus
+     */
     public void enterInTheBus(Passenger p){
         if(passengerInTheBus==3){
             canGo=true;
@@ -117,6 +128,11 @@ public class BusDriver extends Thread {
         }
 
     }
+
+    /**
+     *
+     * @return the passenger that exit of the bus
+     */
     public Passenger exitInTheBus(){
         Passenger p;
         passengerInTheBus--;
@@ -126,7 +142,9 @@ public class BusDriver extends Thread {
 
     }
 
-
+    /**
+     * Timer that the busDriver wait
+     */
     private void stopTimerWaitingForPassenger(){
         canGo = true;
         this.timerWait.cancel();
@@ -146,6 +164,10 @@ public class BusDriver extends Thread {
         }
     }
 
+    /**
+     *  Function that tell the busDriver when work is Ended
+     * @return
+     */
     private boolean hasDaysWorkEnded(){
         return false;
     }
@@ -158,26 +180,42 @@ public class BusDriver extends Thread {
         return state;
     }
 
+    /**
+     *  Change the Bus Driver state
+     * @param s atual state of BusDriver
+     */
     public void setState(States s){
         StackTraceElement[] ste = Thread.currentThread().getStackTrace();
         this.state = s;
     }
 
+    /**
+     * Change the state when go to Departure Terminal
+     */
     public void goToDepartureTerminal(){
         setState(States.DF);
     }
-
+    /**
+     * Change the state when go to Arraival Terminal
+     */
     public void goToArrivalTerminal(){
         setState(States.DB);
     }
-
+    /**
+     * Change the state when go to parkTheBusDepartureTerminal
+     */
     public void parkTheBusDepartureTerminal(){
         setState(States.PKAT);
     }
-
+    /**
+     * Change the state when park bus in arrival terminal
+     */
     public void parkTheBusArrivalTerminal(){
         setState(States.PKDT);
     }
+    /**
+     * Change the state enter in the bus
+     */
 
     public static int getPassengerInTheBus(){
         return passengerInTheBus;

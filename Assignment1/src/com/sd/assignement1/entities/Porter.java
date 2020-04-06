@@ -5,35 +5,59 @@ import com.sd.assignement1.mainProgram.*;
 import com.sd.assignement1.sharedRegions.*;
 
 /**
- * This datatype implements the Passenger thread.
- * In his lifecycle, the passenger breaks his car,
- * gets (or not) a replacement car, and gets his
- * car fixed. <p>
- * He follows the following order:
- * <ul>
- * <li> Uses his car until it breaks down;
- * <li> Goes to repair shop and queues in;
- * <li> Asks (or not) the manager for a replacement car;
- * <li> Goes back to work with a replacement car or by bus;
- * <li> After the manager calls, the customer goes back to the shop;
- * <li> Finally the customer pays for the service, and gets the car back.
- * </ul>
+ * This datatype implements the Porter thread.
+ * 1 option
+ *
+ * 1 - waiting for a plane to land ( Can be repeated many times)
+ * 1.2 - at the plane's hold
+ * 1.3 at the luggage conveyor belt
+ *
+ *
+ * 2 option
+ *  * 1 - waiting for a plane to land ( Can be repeated many times)
+ *  * 1.2 - at the plane's hold
+ *  * 1.3 at the storeroom
  */
 
 public class Porter extends Thread{
 
+    /**
+     * state of Porter
+     */
     private States state;
 
+    /**
+     * Repository
+     */
     private Repository repo;
 
+    /**
+     * Bag
+     */
     private Bag bag;
 
+    /**
+     * Plane
+     */
     private Plane plane;
-
+    /**
+     * baggage Collection Point
+     */
     private BaggageCollectionPoint baggageCollectionPoint;
 
+    /**
+     * Temporary Stroge Area
+     */
     private TemporaryStorageArea temporaryStorageArea;
 
+    /**
+     * Porter instantiation
+     * @param repo Repository
+     * @param state State of Porter
+     * @param p Plane that land
+     * @param baggageCollectionPoint Baggage Collection Point
+     * @param temporaryStorageArea Temporary Storage area
+     */
     public Porter(Repository repo, States state, Plane p, BaggageCollectionPoint baggageCollectionPoint, TemporaryStorageArea temporaryStorageArea){
         this.state = state;
         this.repo = repo;
@@ -43,18 +67,35 @@ public class Porter extends Thread{
 
     }
 
+    /**
+     * Set Porter State
+     * @param state
+     */
+
     public void setPorterState(States state){
         this.state = state;
     }
 
+    /**
+     * Get Porter State
+     * @return
+     */
     public States getPorterState(){
         return state;
     }
 
+    /**
+     * Set Plane tha land
+     * @param p
+     */
     public void setPlane(Plane p){
         this.plane = p;
     }
 
+    /**
+     * Guide of Porter
+     * @param s
+     */
     private void goTo(States s) {
         switch (s) {
             case WPTL:
@@ -88,6 +129,9 @@ public class Porter extends Thread{
         }
     }
 
+    /**
+     * Life cycle of Porter
+     */
     @Override
     public void run(){
         boolean ended = false;

@@ -77,7 +77,6 @@ public class Repository {
                 export;
         }
     }
-
     /**
      * Increment number of Bags Passagenger
      */
@@ -86,6 +85,7 @@ public class Repository {
         //Reavaliar
         setPassengerState(numberOfBagsPassenger, States.RECEPTION, true);
     }
+
 
     /**
      * Decrement number of Bags Passagenger

@@ -87,10 +87,18 @@ public enum States {
 
     private final String description;
 
+    /**
+     *
+     * @param description
+     */
     private States(String description){
         this.description = description;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String toString(){
         return this.description;

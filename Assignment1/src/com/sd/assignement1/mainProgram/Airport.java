@@ -5,6 +5,9 @@ import com.sd.assignement1.sharedRegions.*;
 
 import java.util.Random;
 
+/**
+ * Airport is the main thread of the program
+ */
 public class Airport {
     /**
      * Number of Planes
